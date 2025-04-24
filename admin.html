@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="admin-link">
+    <a href="index.html">Go to VIEW NOTICES</a>
+  </div>
+
+  <h2>Admin Login</h2>
+  <form id="loginForm">
+    <label for="username">Username:</label>
+    <input type="text" id="username" required>
+    <label for="password">Password:</label>
+    <input type="password" id="password" required>
+    <button type="submit">Login</button>
+  </form>
+
+  <div id="adminPanel" style="display:none;">
+    <button id="logoutButton">Logout</button>
+
+    <h2>Recruitment Notices</h2>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Sl. No.</th>
+          <th>Date</th>
+          <th>Department</th>
+          <th>Job</th>
+          <th>Qualification</th>
+          <th>Min Age</th>
+          <th>Max Age</th>
+          <th>Age as on Date</th>
+          <th>Last Date</th>
+          <th>Remarks</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="noticeTable"></tbody>
+    </table>
+
+    <h3>Add/Edit Recruitment Notice</h3>
+    <form id="noticeForm">
+      <input type="hidden" id="noticeId">
+      <label>Date:</label><input type="date" id="date" required>
+      <label>Department:</label><input type="text" id="department" required>
+      <label>Job:</label><input type="text" id="job" required>
+      <label>Qualification:</label><input type="text" id="qualification" required>
+      <label>Min Age:</label><input type="number" id="minAge" required>
+      <label>Max Age:</label><input type="number" id="maxAge" required>
+      <label>Age as on Date:</label><input type="date" id="ageAsOnDate" required>
+      <label>Last Date:</label><input type="date" id="lastDate" required>
+      <label>Remarks:</label><input type="text" id="remarks">
+      <button type="submit">Save Notice</button>
+    </form>
+
+    <h2>Admission and Entrance Notices</h2>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Sl. No.</th>
+          <th>Name of Exam</th>
+          <th>Specialization</th>
+          <th>Last Date</th>
+          <th>Correction Date</th>
+          <th>Admit Date</th>
+          <th>Exam Date</th>
+          <th>Result Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="admissionTable"></tbody>
+    </table>
+
+    <h3>Add/Edit Admission Notice</h3>
+    <form id="admissionForm">
+      <input type="hidden" id="admissionId">
+      <label>Name of Exam:</label><input type="text" id="examName" required>
+      <label>Specialization:</label><input type="text" id="specialization" required>
+      <label>Last Date:</label><input type="date" id="lastDateAdm" required>
+      <label>Correction Date:</label><input type="date" id="correctionDate">
+      <label>Admit Date:</label><input type="date" id="admitDate">
+      <label>Exam Date:</label><input type="date" id="examDate">
+      <label>Result Date:</label><input type="date" id="resultDate">
+      <button type="submit">Save Admission Notice</button>
+    </form>
+  </div>
+
+  <script>
+    function formatDate(dateStr) {
+      if (!dateStr) return "";
+      const [year, month, day] = dateStr.split("-");
+      return `${day}/${month}/${year}`;
+    }
+
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      if (document.getElementById("username").value === "Hemanta" && document.getElementById("password").value === "Password") {
+        alert("Login successful!");
+        document.getElementById("loginForm").style.display = "none";
+        document.getElementById("adminPanel").style.display = "block";
+        loadNotices();
+        loadAdmissions();
+      } else {
+        alert("Invalid credentials!");
+      }
+    });
+
+    document.getElementById("logoutButton").addEventListener("click", function() {
+      alert("Logged out successfully!");
+      document.getElementById("adminPanel").style.display = "none";
+      document.getElementById("loginForm").style.display = "block";
+    });
+
+    function loadNotices() {
+      let notices = JSON.parse(localStorage.getItem("notices")) || [];
+      document.getElementById("noticeTable").innerHTML = notices.map((n, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${formatDate(n.date)}</td>
+          <td>${n.department}</td>
+          <td>${n.job}</td>
+          <td>${n.qualification}</td>
+          <td>${n.minAge}</td>
+          <td>${n.maxAge}</td>
+          <td>${formatDate(n.ageAsOnDate)}</td>
+          <td>${formatDate(n.lastDate)}</td>
+          <td>${n.remarks}</td>
+          <td>
+            <button onclick="editNotice(${i})">Edit</button>
+            <button onclick="deleteNotice(${i})">Delete</button>
+          </td>
+        </tr>`).join("");
+    }
+
+    function loadAdmissions() {
+      let admissions = JSON.parse(localStorage.getItem("admissions")) || [];
+      document.getElementById("admissionTable").innerHTML = admissions.map((a, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${a.examName}</td>
+          <td>${a.specialization}</td>
+          <td>${formatDate(a.lastDateAdm)}</td>
+          <td>${formatDate(a.correctionDate)}</td>
+          <td>${formatDate(a.admitDate)}</td>
+          <td>${formatDate(a.examDate)}</td>
+          <td>${formatDate(a.resultDate)}</td>
+          <td>
+            <button onclick="editAdmission(${i})">Edit</button>
+            <button onclick="deleteAdmission(${i})">Delete</button>
+          </td>
+        </tr>`).join("");
+    }
+
+    document.getElementById("noticeForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      const notice = {
+        date: document.getElementById("date").value,
+        department: document.getElementById("department").value,
+        job: document.getElementById("job").value,
+        qualification: document.getElementById("qualification").value,
+        minAge: document.getElementById("minAge").value,
+        maxAge: document.getElementById("maxAge").value,
+        ageAsOnDate: document.getElementById("ageAsOnDate").value,
+        lastDate: document.getElementById("lastDate").value,
+        remarks: document.getElementById("remarks").value
+      };
+
+      let notices = JSON.parse(localStorage.getItem("notices")) || [];
+      const index = document.getElementById("noticeId").value;
+      if (index) {
+        notices[index] = notice;
+      } else {
+        notices.push(notice);
+      }
+
+      localStorage.setItem("notices", JSON.stringify(notices));
+      loadNotices();
+      document.getElementById("noticeForm").reset();
+      document.getElementById("noticeId").value = "";
+    });
+
+    document.getElementById("admissionForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      let admissions = JSON.parse(localStorage.getItem("admissions")) || [];
+      const index = document.getElementById("admissionId").value;
+
+      const admission = {
+        slNo: index ? parseInt(index) + 1 : admissions.length + 1,
+        examName: document.getElementById("examName").value,
+        specialization: document.getElementById("specialization").value,
+        lastDateAdm: document.getElementById("lastDateAdm").value,
+        correctionDate: document.getElementById("correctionDate").value,
+        admitDate: document.getElementById("admitDate").value,
+        examDate: document.getElementById("examDate").value,
+        resultDate: document.getElementById("resultDate").value
+      };
+
+      if (index) {
+        admissions[index] = admission;
+      } else {
+        admissions.push(admission);
+      }
+
+      localStorage.setItem("admissions", JSON.stringify(admissions));
+      loadAdmissions();
+      document.getElementById("admissionForm").reset();
+      document.getElementById("admissionId").value = "";
+    });
+
+    function deleteNotice(index) {
+      let notices = JSON.parse(localStorage.getItem("notices")) || [];
+      notices.splice(index, 1);
+      localStorage.setItem("notices", JSON.stringify(notices));
+      loadNotices();
+    }
+
+    function deleteAdmission(index) {
+      let admissions = JSON.parse(localStorage.getItem("admissions")) || [];
+      admissions.splice(index, 1);
+      localStorage.setItem("admissions", JSON.stringify(admissions));
+      loadAdmissions();
+    }
+
+    function editNotice(index) {
+      let notices = JSON.parse(localStorage.getItem("notices")) || [];
+      const n = notices[index];
+      document.getElementById("noticeId").value = index;
+      document.getElementById("date").value = n.date;
+      document.getElementById("department").value = n.department;
+      document.getElementById("job").value = n.job;
+      document.getElementById("qualification").value = n.qualification;
+      document.getElementById("minAge").value = n.minAge;
+      document.getElementById("maxAge").value = n.maxAge;
+      document.getElementById("ageAsOnDate").value = n.ageAsOnDate;
+      document.getElementById("lastDate").value = n.lastDate;
+      document.getElementById("remarks").value = n.remarks;
+    }
+
+    function editAdmission(index) {
+      let admissions = JSON.parse(localStorage.getItem("admissions")) || [];
+      const a = admissions[index];
+      document.getElementById("admissionId").value = index;
+      document.getElementById("examName").value = a.examName;
+      document.getElementById("specialization").value = a.specialization;
+      document.getElementById("lastDateAdm").value = a.lastDateAdm;
+      document.getElementById("correctionDate").value = a.correctionDate;
+      document.getElementById("admitDate").value = a.admitDate;
+      document.getElementById("examDate").value = a.examDate;
+      document.getElementById("resultDate").value = a.resultDate;
+    }
+  </script>
+</body>
+</html>

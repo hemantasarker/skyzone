@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sky Zone - Notices</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 2.5em;
+      color: #2c3e50;
+    }
+    .address {
+      margin-top: 10px;
+      font-size: 0.95em;
+      line-height: 1.5;
+    }
+    .admin-link {
+      text-align: right;
+      margin-bottom: 20px;
+    }
+    .admin-link a {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .admin-link a:hover {
+      text-decoration: underline;
+    }
+    h2 {
+      margin-top: 40px;
+      color: #2c3e50;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      padding: 8px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+    .urgent {
+      color: red;
+      font-weight: bold;
+      animation: blink 1s infinite;
+    }
+    .soon {
+      color: blue;
+      font-weight: bold;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Sky Zone</h1>
+    <div class="address">
+      Room No. 9, Sree MAA Centre, Near Vasudev Gas Connection, Kalibari Road,<br>
+      PO. & PS. Lumding, Dist. Hojai (Assam), Pin-782447<br>
+      Contact and Whatsapp Number: +91 9957308431<br>
+      Email ID: ourskyzone.com@gmail.com
+    </div>
+  </header>
+
+  <div class="admin-link">
+    <a href="admin.html">Go to Admin Page</a>
+  </div>
+  <h1>Sky Zone - Recruitment & Admission Notices</h1>
+
+  <h2>Recruitment Notices</h2>
+  <table id="recruitmentTable">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Department</th>
+        <th>Job</th>
+        <th>Qualification</th>
+        <th>Min Age</th>
+        <th>Max Age</th>
+        <th>Age as on Date</th>
+        <th>Last Date</th>
+        <th>Remarks</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h2>Admission & Entrance Notices</h2>
+<h2>Admission & Entrance Notices</h2>
+<table id="admissionTable">
+  <thead>
+    <tr>
+      <th>Sl. No.</th>
+      <th>Name of Exam</th>
+      <th>Specialization</th>
+      <th>Last Date</th>
+      <th>Correction Date</th>
+      <th>Admit Date</th>
+      <th>Exam Date</th>
+      <th>Result Date</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+  <script>
+    function getBlinkClass(dateStr) {
+      const today = new Date();
+      const date = new Date(dateStr);
+      const diff = (date - today) / (1000 * 60 * 60 * 24);
+      if (diff <= 2) return 'urgent';
+      if (diff <= 5) return 'soon';
+      return '';
+    }
+
+    function loadRecruitmentNotices() {
+      const data = JSON.parse(localStorage.getItem("notices")) || [];
+      const tbody = document.querySelector("#recruitmentTable tbody");
+      tbody.innerHTML = data.map(notice => `
+        <tr>
+          <td>${notice.date}</td>
+          <td>${notice.department}</td>
+          <td>${notice.job}</td>
+          <td>${notice.qualification}</td>
+          <td>${notice.minAge}</td>
+          <td>${notice.maxAge}</td>
+          <td>${notice.ageAsOnDate}</td>
+          <td class="${getBlinkClass(notice.lastDate)}">${notice.lastDate}</td>
+          <td>${notice.remarks}</td>
+        </tr>
+      `).join('');
+    }
+
+function loadAdmissionNotices() {
+  const data = JSON.parse(localStorage.getItem("admissions")) || [];
+  const tbody = document.querySelector("#admissionTable tbody");
+  tbody.innerHTML = data.map(adm => `
+    <tr>
+      <td>${adm.slNo}</td>
+      <td>${adm.examName}</td>
+      <td>${adm.specialization}</td>
+      <td class="${getBlinkClass(adm.lastDateAdm)}">${adm.lastDateAdm}</td>
+      <td class="${getBlinkClass(adm.correctionDate)}">${adm.correctionDate}</td>
+      <td>${adm.admitDate}</td>
+      <td>${adm.examDate}</td>
+      <td>${adm.resultDate}</td>
+    </tr>
+  `).join('');
+}
+
+    loadRecruitmentNotices();
+    loadAdmissionNotices();
+  </script>
+</body>
+</html>
